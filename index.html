@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>PROJMAN — PMIS Finals Practice Exam</title>
+<style>
+:root{
+ --bg:#fff7f5; --surface:#ffffff; --surface2:#f7f1ef; --text:#302a2a; --muted:#756b69;
+ --accent:#b85c64; --accent2:#e9a6a9; --border:#e5d7d3; --shadow:0 18px 50px rgba(77,45,45,.12);
+ --correct:#267a4a; --correct-bg:#eaf7ef; --wrong:#b73535; --wrong-bg:#fff0f0;
+}
+[data-theme="dark"]{
+ --bg:#211b1c; --surface:#2d2526; --surface2:#382e30; --text:#fff6f4; --muted:#cbbdbc;
+ --accent:#e89aa0; --accent2:#a9666b; --border:#514547; --shadow:0 18px 50px rgba(0,0,0,.35);
+ --correct:#6fda99; --correct-bg:#183524; --wrong:#ff8e8e; --wrong-bg:#3d2222;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at top,#ffe9e7 0,var(--bg) 38%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}
+button{font:inherit}
+.app{min-height:100vh;padding:18px 14px 34px}
+.topbar{max-width:1000px;margin:0 auto 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.brand img{width:42px;height:37px;object-fit:contain;border-radius:12px}
+.brand span{letter-spacing:.2px}
+.theme-btn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:999px;padding:9px 13px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.05)}
+main{max-width:1000px;margin:0 auto}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:28px;box-shadow:var(--shadow);padding:clamp(20px,4vw,42px)}
+.welcome{min-height:calc(100vh - 100px);display:grid;place-items:center}
+.hero{text-align:center;max-width:760px;margin:auto}
+.hero img{width:164px;height:144px;image-rendering:auto;display:block;margin:0 auto 12px}
+.kicker{color:var(--accent);font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.78rem}
+h1{font-size:clamp(2rem,6vw,4rem);line-height:1.02;margin:8px 0 12px}
+h2{font-size:clamp(1.3rem,3vw,2rem);line-height:1.2;margin:0 0 18px}
+.subtitle{color:var(--muted);font-size:1.02rem;max-width:650px;margin:0 auto 24px}
+.meta{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 26px}
+.pill{background:var(--surface2);border:1px solid var(--border);border-radius:999px;padding:8px 12px;color:var(--muted);font-size:.9rem}
+.primary,.secondary{border:0;border-radius:15px;padding:13px 20px;font-weight:800;cursor:pointer;transition:.2s transform,.2s opacity}
+.primary{background:var(--accent);color:white;box-shadow:0 8px 18px rgba(184,92,100,.25)}
+.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+button:hover{transform:translateY(-1px)} button:focus-visible{outline:3px solid var(--accent2);outline-offset:3px}
+.quiz-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:10px}
+.question-num{color:var(--accent);font-weight:800}
+.progress-wrap{height:9px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--border);margin-bottom:28px}
+.progress{height:100%;background:var(--accent);width:0;transition:width .25s ease}
+.options{display:grid;gap:12px}
+.option{width:100%;text-align:left;border:1px solid var(--border);background:var(--surface2);color:var(--text);padding:15px 16px;border-radius:16px;cursor:pointer;display:flex;gap:12px;align-items:flex-start;transition:.18s}
+.option:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px)}
+.letter{width:30px;height:30px;flex:0 0 30px;border-radius:9px;display:grid;place-items:center;background:var(--surface);font-weight:900;border:1px solid var(--border)}
+.option.correct{border-color:var(--correct);background:var(--correct-bg)}
+.option.correct .letter{background:var(--correct);color:white;border-color:var(--correct)}
+.option.wrong{border-color:var(--wrong);background:var(--wrong-bg)}
+.option.wrong .letter{background:var(--wrong);color:white;border-color:var(--wrong)}
+.feedback{margin-top:18px;padding:16px;border-radius:16px;border:1px solid var(--border);background:var(--surface2)}
+.feedback strong{display:block;margin-bottom:5px}
+.feedback.correct{border-color:var(--correct);background:var(--correct-bg)}
+.feedback.wrong{border-color:var(--wrong);background:var(--wrong-bg)}
+.next-row{display:flex;justify-content:flex-end;margin-top:18px}
+.results{text-align:center}
+.score-ring{width:170px;height:170px;border-radius:50%;display:grid;place-items:center;margin:12px auto 22px;background:conic-gradient(var(--accent) var(--score),var(--surface2) 0);position:relative}
+.score-ring::after{content:"";position:absolute;inset:13px;border-radius:50%;background:var(--surface)}
+.score-text{position:relative;z-index:1;font-size:2.1rem;font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.stat{padding:15px;background:var(--surface2);border:1px solid var(--border);border-radius:16px}
+.stat b{display:block;font-size:1.5rem}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:22px}
+.review-list{display:grid;gap:16px;margin-top:20px}
+.review-item{border:1px solid var(--border);border-radius:20px;padding:18px;background:var(--surface)}
+.review-item.correct{border-left:6px solid var(--correct)}
+.review-item.wrong{border-left:6px solid var(--wrong)}
+.review-q{font-weight:800;margin-bottom:10px}
+.review-choice{padding:7px 9px;border-radius:9px;color:var(--muted);font-size:.94rem}
+.review-choice.selected{font-weight:700}
+.review-choice.correct{background:var(--correct-bg);color:var(--correct)}
+.review-choice.wrong{background:var(--wrong-bg);color:var(--wrong)}
+.review-exp{margin-top:10px;color:var(--muted);font-size:.94rem}
+.hidden{display:none!important}
+.small-note{color:var(--muted);font-size:.84rem;margin-top:18px}
+@media(max-width:600px){
+ .app{padding:10px 10px 24px} .card{border-radius:20px;padding:20px 16px}
+ .topbar{margin-bottom:10px} .brand span{font-size:.9rem}
+ .quiz-head{align-items:start;flex-direction:column;gap:3px}
+ .stats{grid-template-columns:1fr}
+ .hero img{width:130px;height:auto}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><img src="assets/grizzamstudy.gif" alt="Study mascot"><span>PROJMAN • PMIS Practice Exam</span></div>
+  <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light and dark mode">🌙 Theme</button>
+</header>
+<main>
+<section id="welcome" class="card welcome">
+  <div class="hero">
+    <img src="assets/grizzamstudy.gif" alt="Study mascot">
+    <div class="kicker">Project Management Information Systems</div>
+    <h1>PROJMAN Finals Practice Exam</h1>
+    <p class="subtitle">76 college-level questions based on the supplied PROJMAN Finals reviewer. Apply concepts, analyze scenarios, and test your understanding one question at a time.</p>
+    <div class="meta"><span class="pill">76 Questions</span><span class="pill">4 Choices Each</span><span class="pill">Instant Feedback</span><span class="pill">Review + Retake</span></div>
+    <button class="primary" id="startBtn">START QUIZ</button>
+    <div class="small-note">Source basis: PROJMAN Finals Reviewer — Chapters 1 and 2.</div>
+  </div>
+</section>
+
+<section id="quiz" class="card hidden" aria-live="polite">
+  <div class="quiz-head"><div class="question-num" id="qNum">Question 1 of 76</div><div id="percent">0%</div></div>
+  <div class="progress-wrap" aria-label="Quiz progress"><div class="progress" id="progress"></div></div>
+  <div class="kicker" id="chapterTag">Chapter 1 • Communication & Stakeholders</div><h2 id="question"></h2>
+  <div class="options" id="options"></div>
+  <div id="feedback" class="feedback hidden"></div>
+  <div class="next-row"><button class="primary hidden" id="nextBtn">NEXT QUESTION →</button></div>
+</section>
+
+<section id="results" class="card results hidden">
+  <img src="assets/grizzamstudy.gif" alt="Study mascot" style="width:110px;height:auto">
+  <div class="kicker">Quiz Complete</div>
+  <h1>Your Results</h1>
+  <div class="score-ring" id="scoreRing" style="--score:0%"><div class="score-text" id="scoreText">0%</div></div>
+  <h2 id="performance">Keep practicing!</h2>
+  <div class="stats">
+    <div class="stat"><span>Correct</span><b id="correctStat">0</b></div>
+    <div class="stat"><span>Incorrect</span><b id="wrongStat">0</b></div>
+    <div class="stat"><span>Total</span><b id="totalStat">76</b></div>
+  </div>
+  <div class="actions"><button class="primary" id="reviewBtn">REVIEW MY ANSWERS</button><button class="secondary" id="retakeBtn">RETAKE QUIZ</button></div>
+</section>
+
+<section id="review" class="card hidden">
+  <div class="quiz-head"><div><div class="kicker">Answer Review</div><h2 style="margin-top:5px">Your Submitted Answers</h2></div><button class="secondary" id="backResultsBtn">← RESULTS</button></div>
+  <div id="reviewList" class="review-list"></div>
+</section>
+</main>
+</div>
+
+<script>
+const QUESTIONS = [{"q": "A project team uses one centralized platform to exchange information, coordinate activities, share documents, and monitor progress. Which concept is being implemented?", "a": ["A Project Management Information System (PMIS)", "A standalone scheduling template", "A document-printing utility", "A financial ledger used only by accounting"], "correct": 0, "e": "The PDF defines PMIS as a centralized platform for team and stakeholder information exchange, coordination, document sharing, and progress monitoring."}, {"q": "A project manager says the PMIS should replace scattered status messages with a trusted environment where everyone can see the same project information. What is the principal value being emphasized?", "a": ["Shared visibility across communication, collaboration, and stakeholder management", "Eliminating the need for project decisions", "Giving every stakeholder unrestricted editing rights", "Replacing all project planning activities"], "correct": 0, "e": "The reviewer says PMIS creates one trusted environment and replaces disconnected updates with shared visibility."}, {"q": "A project coordinator posts a project launch announcement and collects team messages about initial requirements. Which communication process is this?", "a": ["Create & Collect", "Store & Retrieve", "Share & Distribute", "Manage & Govern"], "correct": 0, "e": "Create & Collect gathers and creates project information; announcements and messages are examples."}, {"q": "Meeting minutes and approved project documents are saved in the PMIS so the team can locate them later. Which process does this represent?", "a": ["Store & Retrieve", "Create & Collect", "Share & Distribute", "Manage & Govern"], "correct": 0, "e": "Store & Retrieve preserves information and makes it findable when needed."}, {"q": "A project analyst sends a budget report and updated schedule to the departments that need them. Which PMIS communication process is demonstrated?", "a": ["Share & Distribute", "Create & Collect", "Store & Retrieve", "Manage & Govern"], "correct": 0, "e": "Share & Distribute sends the right information to the people who need it."}, {"q": "A PMIS administrator controls discussion permissions, decision records, and access to project information. Which process is most directly involved?", "a": ["Manage & Govern", "Create & Collect", "Store & Retrieve", "Share & Distribute"], "correct": 0, "e": "Manage & Govern controls discussions, decisions, access, and project information."}, {"q": "A dashboard contains an accurate report, but it is sent to the wrong department. Which core communication principle has been violated most directly?", "a": ["Right Person", "Right Information", "Right Time", "Version Control"], "correct": 0, "e": "Right Person means directing information to the appropriate recipient."}, {"q": "A stakeholder receives a correct schedule only after the deadline for acting on it has passed. Which principle was not satisfied?", "a": ["Right Time", "Right Person", "Right Information", "Shared Workspace"], "correct": 0, "e": "Right Time means delivering information when it is needed."}, {"q": "A team distributes an outdated budget that contains incorrect figures. Which core principle is primarily violated?", "a": ["Right Information", "Right Person", "Right Time", "Task Assignment"], "correct": 0, "e": "Right Information requires useful and correct information."}, {"q": "A project office needs to align teams quickly after a policy change. Which project information type is most suitable?", "a": ["Announcements & Messages", "Minutes & Documents", "Dashboard & Notifications", "Schedules, Budgets, & Tasks"], "correct": 0, "e": "The PDF associates announcements and messages with quickly aligning teams."}, {"q": "A sponsor wants to see whether actual performance differs from the approved plan. Which information type should be emphasized?", "a": ["Updates & Performance Reports", "Announcements & Messages", "Minutes & Documents", "Discussions & Decisions"], "correct": 0, "e": "Updates and performance reports show status and variances."}, {"q": "A team needs to coordinate delivery dates, spending limits, and assigned work. Which information type best supports this?", "a": ["Schedules, Budgets, & Tasks", "Dashboard & Notifications", "Discussions & Decisions", "Announcements & Messages"], "correct": 0, "e": "Schedules, budgets, and tasks coordinate delivery."}, {"q": "A project manager wants the system to prompt a responsible person when an action is due. Which information type is most relevant?", "a": ["Dashboard & Notifications", "Minutes & Documents", "Discussions & Decisions", "Announcements & Messages"], "correct": 0, "e": "Dashboards and notifications prompt timely action."}, {"q": "A dispute arises about what was agreed during a previous meeting. Which information type provides the formal record?", "a": ["Minutes & Documents", "Schedules, Budgets, & Tasks", "Dashboard & Notifications", "Announcements & Messages"], "correct": 0, "e": "Minutes and documents preserve the project record."}, {"q": "A team records a decision and its accountable owner after resolving a disagreement. Which information type is most directly involved?", "a": ["Discussions & Decisions", "Updates & Performance Reports", "Schedules, Budgets, & Tasks", "Dashboard & Notifications"], "correct": 0, "e": "Discussions and decisions create accountability."}, {"q": "A geographically distributed team needs one location for project files, working materials, and shared resources. Which collaboration capability should it use?", "a": ["Shared Workspace", "Version Control", "Virtual Meetings", "Task Assignments"], "correct": 0, "e": "A shared workspace provides one place for project work."}, {"q": "A project task has no clear responsible person and repeatedly misses its due date. Which PMIS collaboration feature most directly addresses the problem?", "a": ["Task Assignments", "Co-editing", "Virtual Meetings", "Version Control"], "correct": 0, "e": "Task assignments establish clear owners and deadlines."}, {"q": "Two analysts need to edit the same project document together rather than circulate separate copies. Which feature is appropriate?", "a": ["Co-editing", "Shared Workspace alone", "Version Control alone", "Virtual Meetings"], "correct": 0, "e": "Co-editing allows collaborators to create documents together."}, {"q": "Team members discuss a question beside the relevant project task so its context is retained. Which capability is being used?", "a": ["Discussion and Messaging", "Task Assignments", "Virtual Meetings", "Version Control"], "correct": 0, "e": "Discussion and messaging help resolve questions in context."}, {"q": "A supplier and a remote project team need to meet face-to-face online. Which collaboration capability supports this?", "a": ["Virtual Meetings", "Co-editing", "Version Control", "Shared Workspace"], "correct": 0, "e": "Virtual meetings connect distributed teams."}, {"q": "A team must distinguish the latest approved file from earlier drafts. Which collaboration feature protects the current authoritative version?", "a": ["Version Control", "Task Assignments", "Discussion and Messaging", "Virtual Meetings"], "correct": 0, "e": "Version control protects the latest truth and reduces confusion among document versions."}, {"q": "A project spans several locations. Live updates keep all sites aligned, while co-editing and version control prevent conflicting copies. Which remote-team benefit is illustrated?", "a": ["A single source of truth with synchronized locations", "Removing the need for stakeholder engagement", "Eliminating all project risks", "Allowing work to proceed without communication"], "correct": 0, "e": "The PDF highlights real-time synchronization and a single source of truth through co-editing and version control."}, {"q": "A remote team uses messaging and virtual meetings to resolve questions without waiting for the next in-person meeting. What benefit does this produce?", "a": ["Shorter response cycles", "More document duplication", "Less accountability", "Delayed decisions by design"], "correct": 0, "e": "Virtual meetings and messaging shorten response cycles."}, {"q": "A stakeholder analysis begins by determining who can influence the project or be affected by it. Which stage is this?", "a": ["Identify", "Analyze", "Plan", "Monitor"], "correct": 0, "e": "Identify asks who influences or is affected by the project."}, {"q": "After listing stakeholders, the project manager evaluates their interests, influence, and expectations. Which stage follows?", "a": ["Analyze", "Identify", "Manage", "Monitor"], "correct": 0, "e": "Analyze examines stakeholder interests, influence, and expectations."}, {"q": "A project manager selects different engagement approaches for a sponsor, supplier, and end user. Which stakeholder-management stage is this?", "a": ["Plan", "Identify", "Analyze", "Monitor"], "correct": 0, "e": "Plan chooses engagement strategies based on stakeholder analysis."}, {"q": "A client raises a concern, and the manager works to obtain feedback, support, and resolve the conflict. Which stage is being performed?", "a": ["Manage", "Identify", "Analyze", "Plan"], "correct": 0, "e": "Manage involves feedback, support, and conflict resolution."}, {"q": "During execution, the project manager reassesses stakeholder reactions and changes the communication approach when necessary. Which stage is this?", "a": ["Monitor", "Identify", "Analyze", "Plan"], "correct": 0, "e": "Monitor adjusts communication and the approach as stakeholder conditions change."}, {"q": "Which group is explicitly included in the PDF as project stakeholders?", "a": ["Sponsors, clients, teams, suppliers, agencies, and users", "Only the project manager and finance staff", "Only external customers", "Only suppliers and regulators"], "correct": 0, "e": "The reviewer explicitly lists sponsors, clients, teams, suppliers, agencies, and users."}, {"q": "A PMIS is used to keep a stakeholder register and classify each stakeholder by interest and influence. Which role of PMIS is demonstrated?", "a": ["Maintaining and classifying stakeholder information", "Implementing the project deliverable", "Replacing stakeholder approvals", "Estimating all project costs"], "correct": 0, "e": "The listed PMIS roles include maintaining the stakeholder register and classifying interest and influence."}, {"q": "A project manager uses PMIS to send tailored progress reports to the appropriate stakeholder groups. Which PMIS role is this?", "a": ["Distributing targeted reports through communication plans", "Controlling the project scope automatically", "Replacing issue ownership", "Removing the need for feedback"], "correct": 0, "e": "The PDF lists implementing communication plans and distributing target reports as PMIS roles."}, {"q": "A PMIS records stakeholder approvals, feedback, issues, and decisions. What management purpose does this primarily support?", "a": ["Traceability and accountability in stakeholder engagement", "Automatic completion of project tasks", "Elimination of stakeholder influence", "Avoidance of all change requests"], "correct": 0, "e": "The listed roles include collecting approvals and feedback and tracking issues and decisions."}, {"q": "A project communication plan identifies the group that must receive a specific update. Which plan element answers this question?", "a": ["Stakeholder", "Information", "Purpose", "Owner"], "correct": 0, "e": "Stakeholder answers: Who needs the information?"}, {"q": "A communication plan specifies that a monthly cost variance report must be sent. Which element defines what content is required?", "a": ["Information", "Purpose", "Method", "Frequency"], "correct": 0, "e": "Information answers: What is required?"}, {"q": "A manager documents that a report is needed so the sponsor can decide whether corrective action is necessary. Which communication-plan element explains why?", "a": ["Purpose", "Stakeholder", "Owner", "Method"], "correct": 0, "e": "Purpose explains why the information is needed."}, {"q": "A team decides that project updates will be delivered through a PMIS dashboard and email. Which plan element describes this?", "a": ["Method", "Frequency", "Feedback", "Information"], "correct": 0, "e": "Method answers how communication will occur."}, {"q": "A project plan states that a status report will be delivered every Friday. Which communication-plan element is specified?", "a": ["Frequency", "Owner", "Purpose", "Stakeholder"], "correct": 0, "e": "Frequency answers when or how often communication will happen."}, {"q": "A communication plan names the project coordinator as the person who prepares and sends the report. Which element is this?", "a": ["Owner", "Stakeholder", "Feedback", "Method"], "correct": 0, "e": "Owner identifies who prepares and delivers the information."}, {"q": "A project communication plan explains how recipients can submit questions and how those responses will be handled. Which element is this?", "a": ["Feedback", "Purpose", "Frequency", "Information"], "correct": 0, "e": "Feedback explains how responses are handled."}, {"q": "A PMIS helps teams coordinate work, provide timely updates, encourage participation, reduce duplication, speed up decisions, and clarify ownership. Which conclusion best captures these benefits?", "a": ["PMIS strengthens project success through coordination, information, engagement, clarity, decision-making, and accountability", "PMIS is primarily a file-storage tool with no management impact", "PMIS removes the need to communicate with stakeholders", "PMIS guarantees that projects cannot experience delays"], "correct": 0, "e": "The PDF summarizes benefits as Coordinate, Inform, Engage, Clarify, Decide, and Account."}, {"q": "A project manager repeatedly collects actual data, compares it with the plan, identifies variances, and initiates corrective action. What process is being performed?", "a": ["Project Monitoring", "Project initiation", "Resource acquisition", "Project closure"], "correct": 0, "e": "The PDF defines project monitoring as an ongoing process of collecting data, comparing actuals to plans, identifying variances, and driving corrective action."}, {"q": "Which PMIS capability most directly helps managers keep a project on course during execution?", "a": ["Real-time visibility, tracking, alerts, and reporting", "Removing all baseline plans", "Restricting access to progress information", "Replacing corrective action with retrospective summaries"], "correct": 0, "e": "The reviewer states PMIS enables real-time visibility, tracking, alerts, and reports to keep projects on course."}, {"q": "A project manager wants to know which tasks are completed, ongoing, or delayed. Which monitoring area should be used?", "a": ["Progress Tracking", "Change Control", "Issue Management", "Status Closing"], "correct": 0, "e": "Progress tracking monitors completed, ongoing, and delayed tasks."}, {"q": "A dashboard shows that 68% of planned work has been completed. Which progress-tracking measure is this?", "a": ["Percentage of work completed", "Resource utilization", "Actual expenses", "Issue urgency"], "correct": 0, "e": "The PDF lists monitoring the percentage of work completed as a progress-tracking activity."}, {"q": "A manager compares actual milestone completion dates with planned milestone dates. Which progress-tracking concern is being monitored?", "a": ["Milestones and deliverables", "Stakeholder influence", "Document access permissions", "Communication method"], "correct": 0, "e": "Progress tracking follows milestones and deliverables."}, {"q": "A project manager reviews hours worked and how heavily staff and equipment are being used. Which measures are being tracked?", "a": ["Hours worked and resource utilization", "Only schedule variance", "Only stakeholder feedback", "Only document versions"], "correct": 0, "e": "The reviewer includes hours worked and resource utilization among progress-tracking measures."}, {"q": "A cost report records actual spending and identifies tasks that depend on other tasks. Which progress-tracking items are covered?", "a": ["Actual expenses and dependencies", "Communication frequency and owner", "Stakeholder interest and influence", "Dashboard colors and layout"], "correct": 0, "e": "The PDF lists actual expenses and dependencies as items to track."}, {"q": "Executives need a concise visual summary of project status rather than a lengthy raw-data export. Which PMIS feature best meets this need?", "a": ["Performance Dashboard", "Issue register only", "Meeting minutes", "Task comment thread"], "correct": 0, "e": "A performance dashboard is a visual summary of project status for quick insights."}, {"q": "A dashboard combines progress, budget, schedule, resources, risks, and issues in one view. What is its main decision-support value?", "a": ["It provides real-time visibility for informed decisions", "It automatically approves all changes", "It removes the need to analyze performance", "It replaces the project communication plan"], "correct": 0, "e": "The PDF says dashboards show key project dimensions and support informed decisions through real-time visibility."}, {"q": "A dashboard indicates that a workstream is on target, another needs attention, and a third is critical. What is the purpose of the status legend?", "a": ["To communicate project conditions quickly and consistently", "To calculate the project budget", "To assign stakeholder influence scores", "To replace progress measurements"], "correct": 0, "e": "The status legend visually distinguishes conditions such as on-target, needs-attention, and critical."}, {"q": "Planned progress is 80%, while actual progress is 60%. Using the PDF formula, what is the schedule variance?", "a": ["−20 percentage points, indicating the project is behind schedule", "+20 percentage points, indicating ahead of schedule", "−140 percentage points, indicating under budget", "+140 percentage points, indicating over budget"], "correct": 0, "e": "Schedule Variance = Actual Progress − Planned Progress = 60% − 80% = −20%, which is behind schedule."}, {"q": "A project has a budgeted cost of ₱200,000 and an actual cost of ₱230,000. Using the PDF formula, what is the cost variance?", "a": ["−₱30,000", "+₱30,000", "₱430,000", "−₱200,000"], "correct": 0, "e": "Cost Variance = Budgeted Cost − Actual Cost = ₱200,000 − ₱230,000 = −₱30,000."}, {"q": "A schedule variance is negative because actual progress is lower than planned progress. What does this result indicate?", "a": ["The project is behind schedule", "The project is ahead of schedule", "The project is necessarily under budget", "The project has completed all milestones"], "correct": 0, "e": "A negative schedule variance in the given example means actual progress trails planned progress."}, {"q": "A cost variance is negative because actual cost exceeds budgeted cost. What does this result indicate in the provided example?", "a": ["Actual spending is above the budgeted cost", "The project has unused budget", "The project is ahead of schedule", "The project has no cost deviation"], "correct": 0, "e": "The example subtracts ₱230,000 actual cost from ₱200,000 budgeted cost, producing −₱30,000."}, {"q": "A dashboard reveals a delay caused by a shortage of resources. What PMIS role is most relevant?", "a": ["Detecting causes of variance, such as delays or resource shortages", "Automatically changing the project objectives", "Removing the need for a corrective response", "Hiding the variance from stakeholders"], "correct": 0, "e": "The PDF says PMIS helps detect causes such as delays, resource shortages, and unexpected issues."}, {"q": "After identifying a negative schedule variance, the manager reallocates resources and adjusts work sequencing. What is the purpose of this response?", "a": ["Corrective action based on variance insights", "Creating an unrelated stakeholder register", "Archiving the issue without action", "Replacing actual data with planned data"], "correct": 0, "e": "Variance insights are used to drive timely adjustments and keep projects on track."}, {"q": "A team member proposes adding a new feature that may affect scope, schedule, and cost. What should happen first in the change-control process?", "a": ["Submit a change request", "Implement the feature immediately", "Close the issue without review", "Update the plan before recording the request"], "correct": 0, "e": "The change-control sequence begins with Submit Request."}, {"q": "After a change request is submitted, where should it be formally captured according to the PDF process?", "a": ["Record it in the PMIS", "Implement it directly in production", "Send it only through an informal chat", "Close the project record"], "correct": 0, "e": "The next change-control step is to record the request in PMIS."}, {"q": "A change request is recorded. The team then evaluates its effect on scope, schedule, and cost. Which step is this?", "a": ["Impact Analysis", "Stakeholder Review", "Implementation", "Issue Closure"], "correct": 0, "e": "Impact analysis evaluates the change across scope, schedule, and cost."}, {"q": "Following impact analysis, the proposed change is presented to affected decision-makers for consideration. Which step is this?", "a": ["Stakeholder Review", "Record in PMIS", "Monitor and close issue", "Identify issue"], "correct": 0, "e": "The change-control process places stakeholder review after impact analysis."}, {"q": "A requested change is rejected after stakeholder review. According to the PDF sequence, should the project plan be updated as though it were approved?", "a": ["No; the plan is updated only if the change is approved", "Yes; every submitted request automatically changes the plan", "Yes; impact analysis alone authorizes implementation", "No; all change requests must be deleted"], "correct": 0, "e": "The stated sequence says “Updates plan if approved,” so approval is a condition for updating the plan."}, {"q": "Once a change is approved and the plan is updated, what activities occur before the change is put into effect?", "a": ["Communication and monitoring", "Stakeholder identification and analysis", "Budget closure and archiving only", "Issue identification and owner assignment only"], "correct": 0, "e": "The PDF sequence includes communication and monitoring before implementation."}, {"q": "Which sequence correctly represents the change-control process in the PDF?", "a": ["Submit request → Record in PMIS → Impact analysis → Stakeholder review → Update plan if approved → Communication and monitor → Implementation", "Identify issue → Assign owner → Implement solution → Close issue", "Record in PMIS → Implement → Submit request → Stakeholder review", "Impact analysis → Implementation → Submit request → Monitor"], "correct": 0, "e": "This is the order shown in the Change Control column on page 5."}, {"q": "A team notices a recurring technical problem that threatens a deliverable. Which process should begin?", "a": ["Issue Management", "Change Control only", "Stakeholder Identification", "Status Reporting and Closing"], "correct": 0, "e": "Issue management is the process for identifying, assessing, assigning, resolving, and monitoring issues."}, {"q": "After identifying an issue, the team determines how urgent it is and how much impact it may have. Which step is next?", "a": ["Assess urgency and impact", "Assign owner", "Monitor and close issue", "Implement the solution immediately"], "correct": 0, "e": "The issue-management sequence starts with identifying, followed by assessing urgency and impact."}, {"q": "An issue has been assessed, but no one is responsible for resolving it. Which process step addresses this gap?", "a": ["Assign owner", "Stakeholder Review", "Update plan if approved", "Distribute target reports"], "correct": 0, "e": "Assigning an owner establishes responsibility for addressing the issue."}, {"q": "An issue owner evaluates options and carries out the selected remedy. Which issue-management step is this?", "a": ["Develop and implement solution", "Assess urgency and impact", "Identify", "Monitor and close issue"], "correct": 0, "e": "The PDF lists developing and implementing a solution after assigning an owner."}, {"q": "A solution has been implemented. What final issue-management activity ensures the matter is followed through?", "a": ["Monitor and close the issue", "Submit a change request automatically", "Repeat impact analysis indefinitely", "Distribute an unrelated dashboard"], "correct": 0, "e": "The issue-management sequence ends with monitoring and closing the issue."}, {"q": "Which statement correctly distinguishes Change Control from Issue Management?", "a": ["Change Control evaluates and governs proposed changes; Issue Management handles identified problems through assessment, ownership, resolution, and closure", "Both are identical processes with the same steps", "Issue Management approves every scope change", "Change Control is only used to close completed tasks"], "correct": 0, "e": "The PDF presents separate workflows: one for proposed changes and another for identifying and resolving issues."}, {"q": "A project status report is prepared to give stakeholders a consistent picture of current work. Which practice from the PDF does this demonstrate?", "a": ["Report progress with clarity and consistency", "Avoid communicating unfavorable status", "Report only after project closure", "Replace actual results with estimates"], "correct": 0, "e": "Status reporting and closing begins with reporting progress clearly and consistently."}, {"q": "A status report summarizes performance, open issues, and approved or pending changes. Which stated reporting objective does this fulfill?", "a": ["Track performance, issues, and changes", "Control confidential access only", "Create a new stakeholder category", "Replace project monitoring"], "correct": 0, "e": "The PDF lists tracking performance, issues, and changes as a status reporting objective."}, {"q": "A report identifies a problem, recommends a response, and supports a decision by the project manager. Which reporting objective is emphasized?", "a": ["Drive corrective actions and decision clarity", "Preserve outdated versions", "Reduce the number of stakeholders", "Avoid timely communication"], "correct": 0, "e": "The reviewer states that reporting should drive corrective actions and decision clarity."}, {"q": "A sponsor and client must receive accurate updates before they make a project decision. Which status-reporting requirement is most directly addressed?", "a": ["Deliver accurate and timely information to stakeholders", "Send every report to every person regardless of role", "Wait until all project work is complete", "Share only informal verbal updates"], "correct": 0, "e": "The PDF explicitly calls for accurate and timely information to stakeholders."}, {"q": "Which overall outcome does the PDF associate with using PMIS for monitoring, control, and reporting?", "a": ["Accurate, timely, and actionable project information", "Guaranteed elimination of all project risks", "Automatic approval of all changes", "Removal of the need for project managers"], "correct": 0, "e": "The final statement says PMIS ensures accurate, timely, and actionable project information."}, {"q": "A manager sees a report showing budget, schedule, risks, and issues, then uses it to decide where immediate intervention is needed. Which set of PMIS functions is being integrated?", "a": ["Monitoring, performance analysis, and reporting", "Only document storage and retrieval", "Only stakeholder identification", "Only virtual meeting scheduling"], "correct": 0, "e": "Chapter 2 connects tracking, dashboard visibility, variance analysis, corrective action, and status reporting."}, {"q": "A project manager compares actual progress against planned progress rather than relying on intuition. Why is this comparison important?", "a": ["It reveals variances that can trigger timely corrective action", "It guarantees that the original plan never changes", "It removes the need to collect project data", "It determines stakeholder influence automatically"], "correct": 0, "e": "Monitoring compares actuals to plans to identify variances and drive corrective action."}];
+let quiz = [];
+let current = 0;
+let answers = [];
+let started = false;
+
+const $ = id => document.getElementById(id);
+const welcome = $('welcome'), quizEl = $('quiz'), results = $('results'), review = $('review');
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--) { const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function buildQuiz() {
+  quiz = QUESTIONS.map(item => {
+    const choices = item.a.map((text, i) => ({text, correct:i===item.correct}));
+    return {...item, choices: shuffle(choices)};
+  });
+  answers = Array(quiz.length).fill(null);
+  current = 0;
+}
+function show(section) {
+  [welcome,quizEl,results,review].forEach(x=>x.classList.add('hidden'));
+  section.classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderQuestion() {
+  const item = quiz[current];
+  $('qNum').textContent = `Question ${current+1} of ${quiz.length}`;
+  const pct = Math.round((current/quiz.length)*100);
+  $('percent').textContent = `${pct}%`;
+  $('progress').style.width = `${(current/quiz.length)*100}%`;
+  $('chapterTag').textContent = current < 40 ? 'Chapter 1 • Communication & Stakeholders' : 'Chapter 2 • Monitoring, Control & Reporting';
+  $('question').textContent = item.q;
+  const container = $('options');
+  container.innerHTML = '';
+  $('feedback').className = 'feedback hidden';
+  $('feedback').innerHTML = '';
+  $('nextBtn').classList.add('hidden');
+  item.choices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className='option';
+    btn.type='button';
+    btn.innerHTML = `<span class="letter">${String.fromCharCode(65+i)}</span><span>${escapeHtml(choice.text)}</span>`;
+    btn.addEventListener('click', () => selectAnswer(i));
+    container.appendChild(btn);
+  });
+}
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+function selectAnswer(index) {
+  if (answers[current] !== null) return;
+  const item = quiz[current];
+  answers[current] = index;
+  [...$('options').children].forEach((btn, i) => {
+    btn.disabled=true;
+    if (item.choices[i].correct) btn.classList.add('correct');
+    if (i===index && !item.choices[i].correct) btn.classList.add('wrong');
+  });
+  const correct = item.choices[index].correct;
+  const fb=$('feedback');
+  fb.className='feedback '+(correct?'correct':'wrong');
+  const correctText=item.choices.find(c=>c.correct).text;
+  fb.innerHTML = `<strong>${correct?'✓ CORRECT':'✗ INCORRECT'}</strong><div><b>Correct answer:</b> ${escapeHtml(correctText)}</div><div style="margin-top:7px">${escapeHtml(item.e)}</div>`;
+  $('nextBtn').textContent = current === quiz.length-1 ? 'VIEW RESULTS →' : 'NEXT QUESTION →';
+  $('nextBtn').classList.remove('hidden');
+}
+function startQuiz() {
+  buildQuiz(); started=true; show(quizEl); renderQuestion();
+}
+function finishQuiz() {
+  const correct=answers.reduce((n,ans,i)=>n+(ans!==null && quiz[i].choices[ans].correct?1:0),0);
+  const total=quiz.length, pct=Math.round(correct/total*100);
+  $('correctStat').textContent=correct; $('wrongStat').textContent=total-correct; $('totalStat').textContent=total;
+  $('scoreText').textContent=pct+'%'; $('scoreRing').style.setProperty('--score',pct+'%');
+  $('performance').textContent = pct>=90 ? 'Excellent work! You mastered the reviewer.' : pct>=75 ? 'Great job! A little more practice can make it even stronger.' : pct>=60 ? 'Good effort! Review the missed items and try again.' : 'Keep practicing! Use the review screen, then retake the quiz.';
+  show(results);
+}
+function renderReview() {
+  const list=$('reviewList'); list.innerHTML='';
+  quiz.forEach((item, qi) => {
+    const selected=answers[qi];
+    const isCorrect=selected!==null && item.choices[selected].correct;
+    const box=document.createElement('article');
+    box.className='review-item '+(isCorrect?'correct':'wrong');
+    box.innerHTML=`<div class="review-q">${qi+1}. ${escapeHtml(item.q)}</div>`;
+    item.choices.forEach((choice, ci)=>{
+      const d=document.createElement('div');
+      d.className='review-choice '+(choice.correct?'correct ':'')+((selected===ci&&!choice.correct)?'wrong ':'')+((selected===ci)?'selected':'');
+      const marker=selected===ci?'Your answer':'';
+      const right=choice.correct?'Correct answer':'';
+      d.textContent=`${String.fromCharCode(65+ci)}. ${choice.text} ${marker ? '— '+marker : right ? '— '+right : ''}`;
+      box.appendChild(d);
+    });
+    const ex=document.createElement('div'); ex.className='review-exp'; ex.innerHTML=`<b>Explanation:</b> ${escapeHtml(item.e)}`;
+    box.appendChild(ex); list.appendChild(box);
+  });
+  show(review);
+}
+$('startBtn').addEventListener('click', startQuiz);
+$('nextBtn').addEventListener('click', () => { if(current<quiz.length-1) { current++; renderQuestion(); } else finishQuiz(); });
+$('reviewBtn').addEventListener('click', renderReview);
+$('retakeBtn').addEventListener('click', startQuiz);
+$('backResultsBtn').addEventListener('click', () => show(results));
+
+const savedTheme=localStorage.getItem('projman-quiz-theme');
+if(savedTheme) document.documentElement.setAttribute('data-theme',savedTheme);
+function updateThemeLabel() { $('themeBtn').textContent=document.documentElement.getAttribute('data-theme')==='dark'?'☀️ Light':'🌙 Theme'; }
+$('themeBtn').addEventListener('click',()=>{
+ const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+ document.documentElement.setAttribute('data-theme',next);
+ localStorage.setItem('projman-quiz-theme',next);
+ updateThemeLabel();
+});
+updateThemeLabel();
+</script>
+</body>
+</html>
